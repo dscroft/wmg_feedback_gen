@@ -1,0 +1,9 @@
+include README.md
+include LICENSE
+include requirements.txt
+include requirements-dev.txt
+recursive-include src/wmg_feedback_gen *.py
+recursive-include tests *.py
+recursive-include examples *.py *.docx *.xlsx
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]

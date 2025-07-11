@@ -1,0 +1,4 @@
+python-docx>=0.8.11
+openpyxl>=3.0.0
+docxtpl>=0.16.0
+jinja2>=3.0.0
