@@ -8,6 +8,7 @@ import re
 import jinja2
 import openpyxl
 from docxtpl import DocxTemplate
+import logging
 
 default_validators = {
     'STUDENTID': lambda x: bool(re.match(r"[0-9]{7}", str(x).strip()))
@@ -57,6 +58,8 @@ def find_columns(sheet, expected):
             if c in columns and columns[c] is None:
                 columns[c] = idx
 
+    logging.debug(f"Found columns: {columns}")
+
     return columns
 
 
@@ -78,6 +81,8 @@ def process_to_dicts(sheet, expected, validators=default_validators):
         row_data = {var: row[idx] for var, idx in columns.items() if idx is not None}
         if validate_row_data(row_data, validators):
             yield row_data
+        else:
+            logging.warning(f"Row data did not pass validation: {row_data}")
 
 
 def extract_row_data(row, columns):
