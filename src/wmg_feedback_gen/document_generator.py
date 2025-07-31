@@ -7,6 +7,7 @@ from docx import Document
 from io import BytesIO
 from jinja2 import meta
 import logging
+import os
 
 def default_hightlight(row_data, filename):
     docx = Document(filename)
@@ -104,11 +105,13 @@ def generate(
     template_vars = tpl.get_undeclared_template_variables(jinja_env=jinja_env)
 
     variables = template_vars.union(output_filename_vars).union(validators.keys())
-    print( variables )
     if expected_vars is not None:
         for var in expected_vars: variables.add(var)
 
     workbook = openpyxl.load_workbook(xlsx_filename, data_only=True)
+
+    # create feedback directory if it does not exist
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
 
     for row_data in core.process_to_dicts(workbook[worksheet], variables, validators):
         #logging.debug(f"Processing row data: {row_data}")
