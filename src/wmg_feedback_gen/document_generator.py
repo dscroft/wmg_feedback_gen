@@ -1,6 +1,5 @@
 import wmg_feedback_gen.core as core
 from docxtpl import DocxTemplate
-from docx.enum.text import WD_COLOR_INDEX
 import openpyxl
 import jinja2
 from docx import Document
@@ -8,6 +7,13 @@ from io import BytesIO
 from jinja2 import meta
 import logging
 import os
+import docx.table
+import docx.enum.text
+
+def highlight_cell(cell: docx.table._Cell, color=docx.enum.text.WD_COLOR_INDEX.YELLOW):
+    for p in cell.paragraphs:
+        for run in p.runs:
+            run.font.highlight_color = color
 
 def default_hightlight(row_data, filename):
     docx = Document(filename)
@@ -23,10 +29,8 @@ def default_hightlight(row_data, filename):
             
             # Highlight the category in the document
             try:
-                for p in lookup[category].paragraphs:
-                    for run in p.runs:
-                        run.font.highlight_color = WD_COLOR_INDEX.YELLOW
-                        logging.debug(f"Highlighting {category} in {filename}")
+                highlight_cell(lookup[category])
+                logging.debug(f"Highlighting {category} in {filename}")
             except KeyError:
                 continue
 
