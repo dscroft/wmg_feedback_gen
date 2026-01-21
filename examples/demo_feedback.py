@@ -3,6 +3,12 @@
 Example script demonstrating how to use the wmg_feedback_gen library.
 
 This script shows how to generate feedback documents using the new library structure.
+
+This example uses the default validators and post-processing steps as suitable for 
+the default WMG feedback templates. Namely, it assumes the presence of a STUDENTID column
+in the provided Excel worksheet which contains a 7 digit student identifier.
+It also highlights the appropriate cells in the feedback table based on the last word in the 
+category column, i.e. "GOOD" will cause the "Good pass" cell to be highlighted.
 """
 
 import sys
