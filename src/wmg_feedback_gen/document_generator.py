@@ -16,16 +16,31 @@ def highlight_cell(cell: docx.table._Cell, color=docx.enum.text.WD_COLOR_INDEX.Y
             run.font.highlight_color = color
 
 def default_hightlight(row_data, filename):
+    logger = logging.getLogger()
+
+    logger.debug(f"Post-processing file: {filename}")
+
     docx = Document(filename)
     for table in docx.tables:
+        logger.debug(f"Processing table with {len(table.rows)} rows.")
         for row in table.rows:
-            if len(row.cells) != 9: # not the correct table
+            logger.debug(f"Processing row with {len(row.cells)} cells.")
+            if len(row.cells) not in (9,8): # not the correct table
                 continue
 
-            comments = row.cells[2]
+            logger.debug(f"Row cells: {[cell.text for cell in row.cells]}")
+
             categories = ["OUTSTANDING", "DISTINCTION", "GOOD", "PASS", "MARGINAL", "FAIL"]
-            lookup = dict(zip(categories, row.cells[3:9]))
+
+            if len(row.cells) == 9: # has the KSB column
+                lookup = dict(zip(categories, row.cells[3:9]))
+            else: # no KSB column
+                lookup = dict(zip(categories, row.cells[2:8]))
+
+            comments = row.cells[1]
             category = comments.text.strip().split()[-1]
+
+            logger.debug(f"Identified category: {category}")
             
             # Highlight the category in the document
             try:
