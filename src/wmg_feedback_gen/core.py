@@ -15,7 +15,11 @@ default_validators = {
 }
 
 def mark_category( mark ):
-    mark = float(mark)
+    try:
+        mark = float(mark)
+    except (TypeError, ValueError):
+        logging.warning(f"Invalid mark value: {mark}")
+        return ""
     if mark >= 80: return "OUTSTANDING"
     if mark >= 70: return "DISTINCTION"
     if mark >= 60: return "GOOD"
@@ -117,7 +121,7 @@ def validate_row_data(row_data, validators=default_validators):
     return True
 
 
-def gen_filename(template, row_data):
+def gen_filename(template: str, row_data: dict) -> str:
     """
     Generate filename using Jinja2 template and row data.
 
@@ -128,5 +132,5 @@ def gen_filename(template, row_data):
     Returns:
         Generated filename string.
     """
-    template = jinja2.Template(template)
+    template = jinja2.Template(str(template))
     return template.render(**row_data)

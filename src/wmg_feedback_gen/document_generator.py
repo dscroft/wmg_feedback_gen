@@ -15,8 +15,8 @@ def highlight_cell(cell: docx.table._Cell, color=docx.enum.text.WD_COLOR_INDEX.Y
         for run in p.runs:
             run.font.highlight_color = color
 
-def default_hightlight(row_data, filename):
-    logger = logging.getLogger()
+def default_hightlight(row_data: dict, filename: str):
+    logger = logging.getLogger(__name__)
 
     logger.debug(f"Post-processing file: {filename}")
 
@@ -33,19 +33,20 @@ def default_hightlight(row_data, filename):
             categories = ["OUTSTANDING", "DISTINCTION", "GOOD", "PASS", "MARGINAL", "FAIL"]
 
             if len(row.cells) == 9: # has the KSB column
+                logger.debug("Detected KSB column in the table.")
                 lookup = dict(zip(categories, row.cells[3:9]))
+                comments = row.cells[2]
             else: # no KSB column
                 lookup = dict(zip(categories, row.cells[2:8]))
+                comments = row.cells[1]
 
-            comments = row.cells[1]
             category = comments.text.strip().split()[-1]
-
             logger.debug(f"Identified category: {category}")
             
             # Highlight the category in the document
             try:
                 highlight_cell(lookup[category])
-                logging.debug(f"Highlighting {category} in {filename}")
+                logger.debug(f"Highlighting {category} in {filename}")
             except KeyError:
                 continue
 
@@ -115,6 +116,9 @@ def generate(
         # Create a new Jinja2 environment if not provided
         jinja_env = jinja2.Environment()
         jinja_env.filters['mark_category'] = core.mark_category
+
+    if validators is None:
+        validators = {}
 
     # Extract Jinja variables from the output_filename string
     output_filename_ast = jinja_env.parse(output_filename)
